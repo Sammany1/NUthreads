@@ -401,3 +401,4 @@ FodyWeavers.xsd
 
 # App setting
 appsettings.json
+.DS_Store
