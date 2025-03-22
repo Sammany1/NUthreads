@@ -1,3 +1,4 @@
 {
-    "dotnet.defaultSolution": "NUthreads.sln"
+    "dotnet.defaultSolution": "NUthreads.sln",
+    "editor.inlineSuggest.enabled": true
 }
