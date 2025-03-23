@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Domain.DTOs
+﻿namespace NUthreads.Domain.DTOs
 {
     public class NewUserDTO
     {
