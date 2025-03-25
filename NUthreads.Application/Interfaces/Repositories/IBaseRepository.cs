@@ -1,6 +1,6 @@
 ﻿using NUthreads.Domain.Models;
 
-namespace CleanArch.Application.Interfaces.Repositories
+namespace NUthreads.Application.Interfaces.Repositories
 {
     public interface IBaseRepository<T> where T : BaseEntity
     {
