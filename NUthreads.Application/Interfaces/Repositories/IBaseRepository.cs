@@ -4,9 +4,9 @@ namespace NUthreads.Application.Interfaces.Repositories
 {
     public interface IBaseRepository<T> where T : BaseEntity
     {
-        Task<T> GetById(int id);
+        Task<T> GetById(string id);
         Task Create(T entity);
         Task Update(T entity);
-        Task Delete(int id);
+        Task<bool> Delete(string id);
     }
 }

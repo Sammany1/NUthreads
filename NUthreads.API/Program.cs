@@ -22,7 +22,7 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     return new MongoClient(settings.AtlasURI);
 });
 
-// Register repositories
+// m4 3arf de lazmt omha eh
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Configure MongoDB mappings
@@ -43,7 +43,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Add health checks
 
 var app = builder.Build();
 
@@ -58,8 +57,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Add global exception handling
-app.UseExceptionHandler("/error");
 
 // Enable HTTPS redirection
 app.UseHttpsRedirection();

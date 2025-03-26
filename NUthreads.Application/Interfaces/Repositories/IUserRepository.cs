@@ -1,11 +1,12 @@
-﻿using NUthreads.Domain.Models;
+﻿using NUthreads.Application.Interfaces.Repositories;
+using NUthreads.Domain.Models;
 
 namespace NUthreads.Infrastructure.Repositories
 {
-    public interface IUserRepository
+    public interface IUserRepository : IBaseRepository<User>
     {
-        Task Add_User(User newUser);
-        Task<User> GetUserById(string id);
         Task<List<User>> GetAllUsers();
+
+        Task<bool> DeleteAllUsers();
     }
 }
