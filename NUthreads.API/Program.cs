@@ -1,8 +1,7 @@
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+
 using Microsoft.OpenApi.Models;
+using NUthreads.Infrastructure;
 using NUthreads.Infrastructure.Contexts;
-using NUthreads.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,17 +13,8 @@ builder.Configuration
 // Configure MongoDB settings
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDBSettings"));
-
-// Register MongoDB client as a singleton
-builder.Services.AddSingleton<IMongoClient>(sp =>
-{
-    var settings = sp.GetRequiredService<IOptions<MongoDBSettings>>().Value;
-    return new MongoClient(settings.AtlasURI);
-});
-
-// m4 3arf de lazmt omha eh
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+// DEPENDENCY INJECTION
+builder.Services.AddInfrastructure();
 // Configure MongoDB mappings
 MongoDbMappings.Configure();
 

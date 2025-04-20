@@ -1,27 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration; // Ensure this is included
-using MongoDB.Driver;
-using MongoDB.EntityFrameworkCore.Extensions;
+﻿using MongoDB.Driver;
 using NUthreads.Domain.Models;
+using Microsoft.Extensions.Options;
 
 namespace NUthreads.Infrastructure.Contexts
 {
-    public class NUthreadsMongoDbContext : DbContext
+    public class NUthreadsMongoDbContext
     {
-        
+        private readonly IMongoDatabase _database;
 
-        public NUthreadsMongoDbContext(DbContextOptions options)
-            : base(options)
+        public NUthreadsMongoDbContext(IMongoClient mongoClient, IOptions<MongoDBSettings> settings)
         {
+            _database = mongoClient.GetDatabase(settings.Value.DatabaseName);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<User>().ToCollection("users");
-        }
-        public DbSet<User> Users { get; init; }
-        public DbSet<User> Post { get; init; }
-        public DbSet<User> Reply { get; init; }
+        public IMongoCollection<User> Users => _database.GetCollection<User>("users");
+        public IMongoCollection<Post> Posts => _database.GetCollection<Post>("posts");
+        public IMongoCollection<Reply> Replies => _database.GetCollection<Reply>("replies");
     }
 }

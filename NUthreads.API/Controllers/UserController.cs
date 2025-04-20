@@ -2,6 +2,7 @@
 using NUthreads.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using NUthreads.Infrastructure.Repositories;
+using NUthreads.Domain.DTOs;
 
 namespace NUthreads.API.Controllers
 {
@@ -15,28 +16,32 @@ namespace NUthreads.API.Controllers
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        [HttpPost("CreateUser")]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(string id)
         {
+            var user = await _repository.GetByIdAsync(id);
+            return Ok(user);
+        }
+
+        [HttpPost("CreateUser")]
+        public async Task<IActionResult> CreateUser([FromBody] NewUserDTO UserToCreate)
+        {
+            User Created_User = new User();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-            var user = new User
+            try
             {
-                Username = dto.Username,
-                Password = dto.Password,
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Email = dto.Email,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-            // Save to the repository
-            await _repository.Create(user);
+                Created_User = await _repository.CreateUserAsync(UserToCreate);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+
+            return CreatedAtAction(nameof(GetUser), new { id = Created_User.Id }, Created_User);
         }
 
         [HttpGet("GetUserById")]
@@ -49,7 +54,7 @@ namespace NUthreads.API.Controllers
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var collection = await _repository.GetAllUsers();
+            var collection = await _repository.GetAllAsync();
             return Ok(collection);
         }
         [HttpPut("UpdateUser")]

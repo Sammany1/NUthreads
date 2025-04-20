@@ -1,71 +1,80 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
+using NUthreads.Domain.DTOs;
 using NUthreads.Domain.Models;
-using NUthreads.Infrastructure.Contexts;
+using NUthreads.Application.Interfaces.Repositories;
+using NUthreads.Application.Interfaces.Validators;
+using NUthreads.Application.Interfaces.Repositories.Common;
+using FluentValidation;
+using System.Security;
 
 
 namespace NUthreads.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
         private readonly IMongoCollection<User> _users;
+        private readonly INewUserDTOValidator _newUserValidator;
+        private readonly IUserRepository _userRepository;
 
-        public UserRepository(IMongoClient mongoClient)
+        public UserRepository(INewUserDTOValidator newUserValidator,IMongoClient mongoClient) : base(mongoClient)
         {
             var database = mongoClient.GetDatabase("NUthreadsDB");
+            _newUserValidator = newUserValidator;
             _users = database.GetCollection<User>("Users");
         }
 
 
-        public async Task Create(User NewUser)
+        public async Task<User> CreateUserAsync(NewUserDTO NewUser)
         {
-            await _users.InsertOneAsync(NewUser);
-
-            return;
-        }
-        public async Task<User> GetById(string id)
-        {
-            var user = _users.Find(x => x.Id == id).FirstOrDefaultAsync();
-            return await user;
-        }
-        public async Task<List<User>> GetAllUsers()
-        {
-            return await _users.Find(_ => true).ToListAsync();
-        }
-        public async Task<bool> Delete(string id)
-        {
-            var result = await _users.DeleteOneAsync(x => x.Id == id);
-            return result.DeletedCount > 0;
-        }
-        //work in progress
-        public async Task Update(User user)
-        {
-            var Old_User = await GetById(user.Id);
-            if (Old_User == null)
+            if (await this.EmailExistsAsync(NewUser.Email))
             {
-                throw new Exception("User not found");
+                throw new Exception("Email Already Exists");
             }
-            Old_User.Username = user.Username;
-            Old_User.Password = user.Password;
-            Old_User.FirstName = user.FirstName;
-            Old_User.LastName = user.LastName;
-            Old_User.Name = user.Name;
-            Old_User.Email = user.Email;
-            Old_User.Followers = user.Followers;
-            Old_User.Following = user.Following;
-            Old_User.Posts = user.Posts;
-            Old_User.UpdatedAt = DateTime.UtcNow;
+            else if (await this.UsernameExistsAsync(NewUser.UserName))
+            {
+                throw new Exception("Username Already Exists");
+
+            }
+                try
+                {
+                    var validationResult = await _newUserValidator.ValidateAsync(NewUser);
+                    if (!validationResult.IsValid)
+                    {
+
+                        throw new ValidationException("Validation failed: " + string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+           
+            
+            User user = new User
+            {
+                FirstName = NewUser.FirstName,
+                LastName = NewUser.LastName,
+                UserName = NewUser.UserName,
+                Email = NewUser.Email,
+                Password = NewUser.Password,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await base.CreateAsync(user);
+            return user;
         }
 
-        public async Task<bool> DeleteAllUsers()
+        public async Task<bool> EmailExistsAsync(string Email)
         {
-            if (await _users.CountDocumentsAsync(_ => true) == 0)
-            {
-                return false;
-            }
+            var user = await _users.Find(x => x.Email == Email).FirstOrDefaultAsync();
+            return user != null;
+        }
 
-            await _users.DeleteManyAsync(_ => true);
-            return true;
+        public async Task<bool> UsernameExistsAsync(string Username)
+        {
+            var user = await _users.Find(x => x.UserName == Username).FirstOrDefaultAsync();
+            return user != null;
         }
     }
 }
