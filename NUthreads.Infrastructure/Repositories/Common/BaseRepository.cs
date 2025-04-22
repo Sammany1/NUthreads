@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using NUthreads.Application.Interfaces.Repositories.Common;
 using NUthreads.Domain.Models;
+using NUthreads.Infrastructure.Contexts;
 
 namespace NUthreads.Infrastructure.Repositories
 {
@@ -9,11 +10,10 @@ namespace NUthreads.Infrastructure.Repositories
     {
         private readonly IMongoCollection<T> _entities;
 
-        public BaseRepository(IMongoClient mongoClient)
+
+        public BaseRepository(IMongoCollection<T> collection)
         {
-            var database = mongoClient.GetDatabase("NUthreadsDB");
-            var collectionName = typeof(T).Name + "s";
-            _entities = database.GetCollection<T>(collectionName);
+            _entities = collection;
         }
         public async Task CreateAsync(T NewEntity)
         {
@@ -26,10 +26,6 @@ namespace NUthreads.Infrastructure.Repositories
             var entity = _entities.Find(x => x.Id == id).FirstOrDefaultAsync();
             return await entity;
         }
-        virtual public async Task<List<T>> GetAllAsync()
-        {
-            return await _entities.Find(_ => true).ToListAsync();
-        }
         virtual public async Task UpdateAsync(T entity)
         {
             var filter = Builders<T>.Filter.Eq(e => e.Id, entity.Id);
@@ -38,7 +34,7 @@ namespace NUthreads.Infrastructure.Repositories
         virtual public async Task<bool> DeleteAsync(string id)
         {
             var result = await _entities.DeleteOneAsync(e => e.Id == id);
-            if (result.DeletedCount == 0)
+            if (result.DeletedCount < 1) 
             {
                 return false;
             }

@@ -8,6 +8,5 @@ namespace NUthreads.Application.Interfaces.Repositories.Common
         Task CreateAsync(T entity);
         Task UpdateAsync(T entity);
         Task<bool> DeleteAsync(string id);
-        Task<List<T>> GetAllAsync();
     }
 }

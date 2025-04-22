@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Domain.DTOs;
 using NUthreads.Domain.Models;
+using NUthreads.Infrastructure.Contexts;
 
 
 namespace NUthreads.Infrastructure.Repositories
@@ -10,13 +11,10 @@ namespace NUthreads.Infrastructure.Repositories
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
         private readonly IMongoCollection<User> _users;
-        private readonly IUserRepository _userRepository;
 
-        public UserRepository(IMongoClient mongoClient) : base(mongoClient)
-        {
-            var database = mongoClient.GetDatabase("NUthreadsDB");
-            _users = database.GetCollection<User>("Users");
-        }
+
+        public UserRepository(NUthreadsDbContext context)
+         : base(context.Users) { }
 
 
         public async Task<User> CreateUserAsync(NewUserDTO NewUser)
@@ -29,7 +27,7 @@ namespace NUthreads.Infrastructure.Repositories
                 UserName = NewUser.UserName,
                 Email = NewUser.Email,
                 Password = NewUser.Password,
-                CreatedAt = DateTime.UtcNow
+                //CreatedAt = DateTime.UtcNow
             };
 
             await base.CreateAsync(user);

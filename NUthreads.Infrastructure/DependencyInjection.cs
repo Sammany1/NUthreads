@@ -14,12 +14,12 @@ namespace NUthreads.Infrastructure
             services.AddSingleton<IMongoClient>(sp =>
             {
                 var settings = sp.GetRequiredService<IOptions<MongoDBSettings>>().Value;
-                return new MongoClient(settings.AtlasURI);
+                return new MongoClient(settings.ConnectionStrings);
             });
 
 
-            services.AddDbContext<NUthreadsDbContext>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddSingleton<NUthreadsDbContext>();
+            services.AddSingleton<IUserRepository, UserRepository>();
             //services.AddScoped<INewUserDTOValidator, NewUserDTOValidator>();
 
 

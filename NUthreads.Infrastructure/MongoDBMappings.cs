@@ -14,10 +14,10 @@ public static class MongoDbMappings
             cm.MapIdMember(c => c.Id)
               .SetIdGenerator(StringObjectIdGenerator.Instance)
               .SetSerializer(new StringSerializer(BsonType.ObjectId)); 
-            cm.MapMember(c => c.CreatedAt)
-              .SetSerializer(new DateTimeSerializer(BsonType.DateTime)); // Ensure DateTime is stored correctly
-            cm.MapMember(c => c.UpdatedAt)
-              .SetSerializer(new DateTimeSerializer(BsonType.DateTime)); // Ensure DateTime is stored correctly
+            //cm.MapMember(c => c.CreatedAt)
+            //  .SetSerializer(new DateTimeSerializer(BsonType.DateTime)); // Ensure DateTime is stored correctly
+            //cm.MapMember(c => c.UpdatedAt)
+            //  .SetSerializer(new DateTimeSerializer(BsonType.DateTime)); // Ensure DateTime is stored correctly
             cm.SetIsRootClass(true); // Indicate that this is a root class in the inheritance hierarchy
         });
 

@@ -46,17 +46,11 @@ namespace NUthreads.API.Controllers
             return CreatedAtAction(nameof(GetUser), new { id = Created_User.Id }, Created_User);
         }
 
-        [HttpGet("GetAllUsers")]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var collection = await _repository.GetAllAsync();
-            return Ok(collection);
-        }
         [HttpDelete("DeleteUserByID")]
         public async Task<IActionResult> DeleteUserByID(string Id)
         {
             if (await _repository.DeleteAsync(Id)){
-                return Ok("User With ID : " + Id + "Deleted Successfully");
+                return Ok("User With ID : " + Id + " Deleted Successfully");
             }
             else
             {
