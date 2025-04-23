@@ -27,8 +27,12 @@ public static class MongoDbMappings
       cm.AutoMap();
     });
 
-
     BsonClassMap.RegisterClassMap<Reply>(cm =>
+    {
+      cm.AutoMap();
+    });
+
+    BsonClassMap.RegisterClassMap<Post>(cm =>
     {
       cm.AutoMap();
     });
