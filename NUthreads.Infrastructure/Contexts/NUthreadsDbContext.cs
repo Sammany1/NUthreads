@@ -19,9 +19,10 @@ namespace NUthreads.Infrastructure.Contexts
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<User>().ToCollection("users");
+            modelBuilder.Entity<Post>().ToCollection("Posts");
         }
         public DbSet<User> Users { get; init; }
-        public DbSet<User> Post { get; init; }
-        public DbSet<User> Reply { get; init; }
+        public DbSet<Post> Posts { get; init; }
+        public DbSet<Reply> Replies { get; init; }
     }
 }

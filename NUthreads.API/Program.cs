@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using NUthreads.Infrastructure.Contexts;
 using NUthreads.Infrastructure.Repositories;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment-specific configuration
@@ -24,6 +25,8 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 
 // m4 3arf de lazmt omha eh
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+
 
 // Configure MongoDB mappings
 MongoDbMappings.Configure();
