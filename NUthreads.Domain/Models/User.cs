@@ -1,6 +1,6 @@
 ﻿namespace NUthreads.Domain.Models
 {
-    public class User : BaseEntity
+    public class User : AuditableEntity
     {
 
         public string FirstName { get; set; }

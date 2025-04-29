@@ -14,4 +14,8 @@
     <ProjectReference Include="../NUthreads.Domain/NUthreads.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\Contexts\" />
+  </ItemGroup>
+
 </Project>

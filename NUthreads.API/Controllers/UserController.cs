@@ -1,9 +1,7 @@
-﻿using NUthreads.Application.Interfaces.Repositories;
-using NUthreads.Domain.Models;
-using Microsoft.AspNetCore.Mvc;
-using NUthreads.Infrastructure.Repositories;
+﻿using Microsoft.AspNetCore.Mvc;
+using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Domain.DTOs;
-using Microsoft.AspNetCore.Authentication;
+using NUthreads.Domain.Models;
 
 namespace NUthreads.API.Controllers
 {
@@ -49,7 +47,8 @@ namespace NUthreads.API.Controllers
         [HttpDelete("DeleteUserByID")]
         public async Task<IActionResult> DeleteUserByID(string Id)
         {
-            if (await _repository.DeleteAsync(Id)){
+            if (await _repository.DeleteAsync(Id))
+            {
                 return Ok("User With ID : " + Id + " Deleted Successfully");
             }
             else

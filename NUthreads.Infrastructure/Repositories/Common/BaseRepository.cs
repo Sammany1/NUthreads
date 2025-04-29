@@ -8,39 +8,42 @@ namespace NUthreads.Infrastructure.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
+        private readonly NUthreadsDbContext _dbcontext;
         private readonly IMongoCollection<T> _entities;
 
+        public BaseRepository(NUthreadsDbContext mongoContext)
+        {
+            _entities = typeof(T) switch
+            {
+                var t when t == typeof(User) => mongoContext.Users as IMongoCollection<T>,
+                var t when t == typeof(Post) => mongoContext.Posts as IMongoCollection<T>,
+                var t when t == typeof(Reply) => mongoContext.Replies as IMongoCollection<T>,
+                _ => throw new ArgumentException("Unsupported type")
+            } ?? throw new InvalidOperationException("Failed to resolve collection");
+        }
 
-        public BaseRepository(IMongoCollection<T> collection)
-        {
-            _entities = collection;
-        }
-        public async Task CreateAsync(T NewEntity)
-        {
-            await _entities.InsertOneAsync(NewEntity);
 
-            return;
-        }
-        virtual public async Task<T> GetByIdAsync(string id)
+        public async Task CreateAsync(T newEntity)
         {
-            var entity = _entities.Find(x => x.Id == id).FirstOrDefaultAsync();
-            return await entity;
+            await _entities.InsertOneAsync(newEntity);
         }
-        virtual public async Task UpdateAsync(T entity)
+
+        public virtual async Task<T> GetByIdAsync(string id)
+        {
+            var entity = await _entities.Find(x => x.Id == id).FirstOrDefaultAsync();
+            return entity;
+        }
+
+        public virtual async Task UpdateAsync(T entity)
         {
             var filter = Builders<T>.Filter.Eq(e => e.Id, entity.Id);
             await _entities.ReplaceOneAsync(filter, entity);
         }
-        virtual public async Task<bool> DeleteAsync(string id)
+
+        public virtual async Task<bool> DeleteAsync(string id)
         {
             var result = await _entities.DeleteOneAsync(e => e.Id == id);
-            if (result.DeletedCount < 1) 
-            {
-                return false;
-            }
-            return true;
+            return result.DeletedCount > 0;
         }
-
-
     }
 }

@@ -1,7 +1,6 @@
 
 using Microsoft.OpenApi.Models;
 using NUthreads.Infrastructure;
-using NUthreads.Infrastructure.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +13,7 @@ builder.Configuration
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDBSettings"));
 // DEPENDENCY INJECTION
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 // Configure MongoDB mappings
 MongoDbMappings.Configure();
 

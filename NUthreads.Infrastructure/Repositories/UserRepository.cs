@@ -10,11 +10,14 @@ namespace NUthreads.Infrastructure.Repositories
 {
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
+        private readonly NUthreadsDbContext _context;
         private readonly IMongoCollection<User> _users;
 
-
-        public UserRepository(NUthreadsDbContext context)
-         : base(context.Users) { }
+        public UserRepository(NUthreadsDbContext context) : base(context)
+        {
+            _context = context;
+             _users= context.Users;
+        }
 
 
         public async Task<User> CreateUserAsync(NewUserDTO NewUser)
@@ -27,7 +30,8 @@ namespace NUthreads.Infrastructure.Repositories
                 UserName = NewUser.UserName,
                 Email = NewUser.Email,
                 Password = NewUser.Password,
-                //CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
             };
 
             await base.CreateAsync(user);

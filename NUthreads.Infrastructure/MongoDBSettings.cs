@@ -1,5 +1,4 @@
-
-namespace NUthreads.Infrastructure.Contexts;
+namespace NUthreads.Infrastructure;
 
 public class MongoDBSettings
 {
