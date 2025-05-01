@@ -1,49 +1,40 @@
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using NUthreads.Application.Interfaces.Repositories.Common;
 using NUthreads.Domain.Models;
 using NUthreads.Infrastructure.Contexts;
 
-namespace NUthreads.Infrastructure.Repositories
+namespace NUthreads.Infrastructure.Repositories.Common
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
+    public class BaseRepository<T>(NUthreadsDbContext context) : IBaseRepository<T> where T : BaseEntity
     {
-        private readonly NUthreadsDbContext _dbcontext;
-        private readonly IMongoCollection<T> _entities;
-
-        public BaseRepository(NUthreadsDbContext mongoContext)
-        {
-            _entities = typeof(T) switch
-            {
-                var t when t == typeof(User) => mongoContext.Users as IMongoCollection<T>,
-                var t when t == typeof(Post) => mongoContext.Posts as IMongoCollection<T>,
-                var t when t == typeof(Reply) => mongoContext.Replies as IMongoCollection<T>,
-                _ => throw new ArgumentException("Unsupported type")
-            } ?? throw new InvalidOperationException("Failed to resolve collection");
-        }
-
+        private readonly NUthreadsDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
+        private readonly DbSet<T> _dbSet = context.Set<T>();
 
         public async Task CreateAsync(T newEntity)
         {
-            await _entities.InsertOneAsync(newEntity);
+            await _dbSet.AddAsync(newEntity);
         }
 
         public virtual async Task<T> GetByIdAsync(string id)
         {
-            var entity = await _entities.Find(x => x.Id == id).FirstOrDefaultAsync();
+            var entity = await _dbSet.FindAsync(id);
             return entity;
         }
 
         public virtual async Task UpdateAsync(T entity)
         {
-            var filter = Builders<T>.Filter.Eq(e => e.Id, entity.Id);
-            await _entities.ReplaceOneAsync(filter, entity);
+            _dbSet.Update(entity);
+            await _context.SaveChangesAsync();
         }
 
         public virtual async Task<bool> DeleteAsync(string id)
         {
-            var result = await _entities.DeleteOneAsync(e => e.Id == id);
-            return result.DeletedCount > 0;
+            var entity = await _dbSet.FindAsync(id);
+            if (entity == null) return false;
+
+            _dbSet.Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

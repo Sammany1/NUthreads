@@ -4,6 +4,7 @@ using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Domain.DTOs;
 using NUthreads.Domain.Models;
 using NUthreads.Infrastructure.Contexts;
+using NUthreads.Infrastructure.Repositories.Common;
 
 
 namespace NUthreads.Infrastructure.Repositories
@@ -11,7 +12,7 @@ namespace NUthreads.Infrastructure.Repositories
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
         private readonly NUthreadsDbContext _context;
-        private readonly IMongoCollection<User> _users;
+        private readonly DbSet<User> _users;
 
         public UserRepository(NUthreadsDbContext context) : base(context)
         {
@@ -25,6 +26,7 @@ namespace NUthreads.Infrastructure.Repositories
 
             User user = new User
             {
+                Id = Guid.NewGuid().ToString(),
                 FirstName = NewUser.FirstName,
                 LastName = NewUser.LastName,
                 UserName = NewUser.UserName,
@@ -40,13 +42,13 @@ namespace NUthreads.Infrastructure.Repositories
 
         public async Task<bool> EmailExistsAsync(string Email)
         {
-            var user = await _users.Find(x => x.Email == Email).FirstOrDefaultAsync();
+            var user = await _users.FirstOrDefaultAsync(x => x.Email == Email);
             return user != null;
         }
 
         public async Task<bool> UsernameExistsAsync(string Username)
         {
-            var user = await _users.Find(x => x.UserName == Username).FirstOrDefaultAsync();
+            var user = await _users.FirstOrDefaultAsync(x => x.UserName == Username);
             return user != null;
         }
     }

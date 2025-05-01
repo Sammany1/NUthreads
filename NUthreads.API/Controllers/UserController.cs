@@ -26,14 +26,14 @@ namespace NUthreads.API.Controllers
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser([FromBody] NewUserDTO UserToCreate)
         {
-            User Created_User = new User();
+            User user = new User();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             try
             {
-                Created_User = await _repository.CreateUserAsync(UserToCreate);
+                user = await _repository.CreateUserAsync(UserToCreate);
             }
             catch (Exception ex)
             {
@@ -41,7 +41,7 @@ namespace NUthreads.API.Controllers
             }
 
 
-            return CreatedAtAction(nameof(GetUser), new { id = Created_User.Id }, Created_User);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
         [HttpDelete("DeleteUserByID")]

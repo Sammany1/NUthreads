@@ -1,21 +1,21 @@
-﻿using Microsoft.Extensions.Configuration;
-using MongoDB.Driver;
+﻿using Microsoft.EntityFrameworkCore;
+using MongoDB.EntityFrameworkCore.Extensions;
 using NUthreads.Domain.Models;
 
 namespace NUthreads.Infrastructure.Contexts
 {
-    public class NUthreadsDbContext
+    public class NUthreadsDbContext(DbContextOptions<NUthreadsDbContext> options) : DbContext(options)
     {
-        private readonly IMongoDatabase _database;
+        public DbSet<User> Users { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Reply> Replies { get; set; }
 
-        public NUthreadsDbContext(IConfiguration config)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var client = new MongoClient("mongodb+srv://AhmedGhaith:Password1@maincluster.xiyna.mongodb.net/?retryWrites=true&w=majority&appName=MainCluster");
-            _database = client.GetDatabase("NUthreads");
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>().ToCollection("Users");
+            modelBuilder.Entity<Post>().ToCollection("Posts");
+            modelBuilder.Entity<Reply>().ToCollection("Replies");
         }
-
-        public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
-        public IMongoCollection<Post> Posts => _database.GetCollection<Post>("Posts");
-        public IMongoCollection<Reply> Replies => _database.GetCollection<Reply>("Replies");
     }
 }

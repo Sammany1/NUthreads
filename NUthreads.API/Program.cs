@@ -1,21 +1,22 @@
-
 using Microsoft.OpenApi.Models;
 using NUthreads.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load environment-specific configuration
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
-
 // Configure MongoDB settings
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDBSettings"));
-// DEPENDENCY INJECTION
-builder.Services.AddInfrastructure(builder.Configuration);
-// Configure MongoDB mappings
-MongoDbMappings.Configure();
+
+// Get MongoDB settings for infrastructure registration
+var mongoDbSettings = builder.Configuration
+    .GetSection("MongoDBSettings")
+    .Get<MongoDBSettings>();
+
+var mongoDbSettingsOptions = Microsoft.Extensions.Options.Options.Create(mongoDbSettings);
+
+// Add infrastructure services (including MongoDB DbContext)
+builder.Services.AddInfrastructure(
+    mongoDbSettingsOptions);
 
 // Add controllers and API explorer
 builder.Services.AddControllers();

@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Infrastructure.Contexts;
@@ -9,23 +11,15 @@ namespace NUthreads.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IOptions<MongoDBSettings> settings)
         {
-
-            services.Configure<MongoDBSettings>(configuration.GetSection("MongoDbSettings").Bind);
-
-            // Get the configured settings
-            var mongoSettings = configuration.GetSection("MongoDbSettings").Get<MongoDBSettings>();
-            if (mongoSettings == null)
+            var connectionString = settings.Value.ConnectionString;
+            var dbName = settings.Value.DatabaseName;
+            services.AddDbContext<NUthreadsDbContext>(options =>
             {
-                throw new InvalidOperationException("MongoDB settings not found in configuration");
-            }
+                options.UseMongoDB(connectionString, dbName);
+            });
 
-            // Register MongoClient as Singleton
-            services.AddSingleton<IMongoClient>(_ =>
-                new MongoClient(mongoSettings.ConnectionStrings)); // Note: ConnectionStrings (plural)
-
-            services.AddSingleton<NUthreadsDbContext>();
             services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
