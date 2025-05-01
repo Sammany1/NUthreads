@@ -4,7 +4,6 @@
     {
         public required string Title { get; set; }
         public required string Text { get; set; }
-        public int UserId { get; set; }
-        public required User User { get; set; }
+        public string UserId { get; set; }
     }
 }

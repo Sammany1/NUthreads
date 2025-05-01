@@ -7,14 +7,9 @@ namespace NUthreads.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserController(IUserRepository repository) : ControllerBase
     {
-        private readonly IUserRepository _repository;
-
-        public UserController(IUserRepository repository)
-        {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        }
+        private readonly IUserRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(string id)

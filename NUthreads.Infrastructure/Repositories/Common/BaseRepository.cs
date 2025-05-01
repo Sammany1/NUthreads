@@ -13,6 +13,7 @@ namespace NUthreads.Infrastructure.Repositories.Common
         public async Task CreateAsync(T newEntity)
         {
             await _dbSet.AddAsync(newEntity);
+            await _context.SaveChangesAsync();
         }
 
         public virtual async Task<T> GetByIdAsync(string id)

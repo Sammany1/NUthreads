@@ -1,4 +1,3 @@
-using Microsoft.OpenApi.Models;
 using NUthreads.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,26 +11,21 @@ var mongoDbSettings = builder.Configuration
     .GetSection("MongoDBSettings")
     .Get<MongoDBSettings>();
 
+
+
 var mongoDbSettingsOptions = Microsoft.Extensions.Options.Options.Create(mongoDbSettings);
 
 // Add infrastructure services (including MongoDB DbContext)
-builder.Services.AddInfrastructure(
-    mongoDbSettingsOptions);
+builder.Services.AddInfrastructure(mongoDbSettingsOptions);
+
+MongoDbMappings.Configure();
 
 // Add controllers and API explorer
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 // Configure Swagger
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "NUThreads API",
-        Version = "v1",
-        Description = "API for managing users in NUThreads.",
-    });
-});
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
