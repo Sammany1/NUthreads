@@ -1,71 +1,55 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
+using NUthreads.Application.Interfaces.Repositories;
+using NUthreads.Domain.DTOs;
 using NUthreads.Domain.Models;
 using NUthreads.Infrastructure.Contexts;
+using NUthreads.Infrastructure.Repositories.Common;
 
 
 namespace NUthreads.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
-        private readonly IMongoCollection<User> _users;
+        private readonly NUthreadsDbContext _context;
+        private readonly DbSet<User> _users;
 
-        public UserRepository(IMongoClient mongoClient)
+        public UserRepository(NUthreadsDbContext context) : base(context)
         {
-            var database = mongoClient.GetDatabase("NUthreadsDB");
-            _users = database.GetCollection<User>("Users");
+            _context = context;
+             _users= context.Users;
         }
 
 
-        public async Task Create(User NewUser)
+        public async Task<User> CreateUserAsync(NewUserDTO NewUser)
         {
-            await _users.InsertOneAsync(NewUser);
 
-            return;
-        }
-        public async Task<User> GetById(string id)
-        {
-            var user = _users.Find(x => x.Id == id).FirstOrDefaultAsync();
-            return await user;
-        }
-        public async Task<List<User>> GetAllUsers()
-        {
-            return await _users.Find(_ => true).ToListAsync();
-        }
-        public async Task<bool> Delete(string id)
-        {
-            var result = await _users.DeleteOneAsync(x => x.Id == id);
-            return result.DeletedCount > 0;
-        }
-        //work in progress
-        public async Task Update(User user)
-        {
-            var Old_User = await GetById(user.Id);
-            if (Old_User == null)
+            User user = new User
             {
-                throw new Exception("User not found");
-            }
-            Old_User.Username = user.Username;
-            Old_User.Password = user.Password;
-            Old_User.FirstName = user.FirstName;
-            Old_User.LastName = user.LastName;
-            Old_User.Name = user.Name;
-            Old_User.Email = user.Email;
-            Old_User.Followers = user.Followers;
-            Old_User.Following = user.Following;
-            Old_User.Posts = user.Posts;
-            Old_User.UpdatedAt = DateTime.UtcNow;
+                Id = Guid.NewGuid().ToString(),
+                FirstName = NewUser.FirstName,
+                LastName = NewUser.LastName,
+                UserName = NewUser.UserName,
+                Email = NewUser.Email,
+                Password = NewUser.Password,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+
+            await base.CreateAsync(user);
+            return user;
         }
 
-        public async Task<bool> DeleteAllUsers()
+        public async Task<bool> EmailExistsAsync(string Email)
         {
-            if (await _users.CountDocumentsAsync(_ => true) == 0)
-            {
-                return false;
-            }
+            var user = await _users.FirstOrDefaultAsync(x => x.Email == Email);
+            return user != null;
+        }
 
-            await _users.DeleteManyAsync(_ => true);
-            return true;
+        public async Task<bool> UsernameExistsAsync(string Username)
+        {
+            var user = await _users.FirstOrDefaultAsync(x => x.UserName == Username);
+            return user != null;
         }
     }
 }
