@@ -6,8 +6,12 @@ namespace NUthreads.Application.Interfaces.Repositories
 {
     public interface IUserRepository : IBaseRepository<User>
     {
-        Task<User> CreateUserAsync(NewUserDTO user);
-        Task<bool> EmailExistsAsync(string email);
-        Task<bool> UsernameExistsAsync(string username);
+        public Task<bool> EmailExistsAsync(string email);
+        public Task<bool> UsernameExistsAsync(string username);
+
+        public bool EmailExists(string Email);
+
+        public bool UsernameExists(string username);
+
     }
 }

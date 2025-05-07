@@ -20,35 +20,25 @@ namespace NUthreads.Infrastructure.Repositories
              _users= context.Users;
         }
 
-
-        public async Task<User> CreateUserAsync(NewUserDTO NewUser)
-        {
-
-            User user = new User
-            {
-                Id = Guid.NewGuid().ToString(),
-                FirstName = NewUser.FirstName,
-                LastName = NewUser.LastName,
-                UserName = NewUser.UserName,
-                Email = NewUser.Email,
-                Password = NewUser.Password,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-            };
-
-            await base.CreateAsync(user);
-            return user;
-        }
-
         public async Task<bool> EmailExistsAsync(string Email)
         {
             var user = await _users.FirstOrDefaultAsync(x => x.Email == Email);
+            return user != null;
+        }
+        public bool EmailExists(string Email)
+        {
+            var user = _users.FirstOrDefault(x => x.Email == Email);
             return user != null;
         }
 
         public async Task<bool> UsernameExistsAsync(string Username)
         {
             var user = await _users.FirstOrDefaultAsync(x => x.UserName == Username);
+            return user != null;
+        }
+        public bool UsernameExists(string Username)
+        {
+            var user =  _users.FirstOrDefault(x => x.UserName == Username);
             return user != null;
         }
     }
