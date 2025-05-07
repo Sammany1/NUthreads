@@ -1,43 +1,48 @@
 using Microsoft.AspNetCore.Mvc;
 using NUthreads.Application.Interfaces.Repositories;
+using NUthreads.Application.Interfaces.Services;
 using NUthreads.Domain.DTOs;
-using NUthreads.Domain.Models;
 
 namespace NUthreads.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController(IUserRepository repository) : ControllerBase
+    public class UserController : ControllerBase
     {
-        private readonly IUserRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        private readonly IUserRepository _repository;
+        private readonly ISignUpService _signUpService;
+
+        public UserController(IUserRepository repository, ISignUpService signUpService)
+        {
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _signUpService = signUpService ?? throw new ArgumentNullException(nameof(signUpService));
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(string id)
         {
             var user = await _repository.GetByIdAsync(id);
-            return Ok(user);
+            return user is not null ? Ok(user) : NotFound("User not found");
         }
 
-        [HttpPost("CreateUser")]
-        public async Task<IActionResult> CreateUser([FromBody] NewUserDTO UserToCreate)
+        [HttpPost("SignUp")]
+        public async Task<IActionResult> SignUp([FromBody] NewUserDTO userToCreate)
         {
-            User user = new User();
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
+
             try
             {
-                user = await _repository.CreateUserAsync(UserToCreate);
+                var result = await _signUpService.SignUp(userToCreate);
+                return result;
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
+
+
 
         [HttpDelete("DeleteUserByID")]
         public async Task<IActionResult> DeleteUserByID(string Id)

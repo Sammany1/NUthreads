@@ -10,10 +10,19 @@ namespace NUthreads.Infrastructure.Repositories.Common
         private readonly NUthreadsDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
         private readonly DbSet<T> _dbSet = context.Set<T>();
 
-        public async Task CreateAsync(T newEntity)
+        public async Task<bool> CreateAsync(T newEntity)
         {
+            var id = newEntity.Id;
             await _dbSet.AddAsync(newEntity);
             await _context.SaveChangesAsync();
+            if (GetByIdAsync(id) != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public virtual async Task<T> GetByIdAsync(string id)
