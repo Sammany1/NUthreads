@@ -16,7 +16,7 @@ namespace NUthreads.Infrastructure.Repositories
 
         public UserRepository(NUthreadsDbContext context) : base(context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
              _users= context.Users;
         }
 

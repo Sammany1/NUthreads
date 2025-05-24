@@ -14,15 +14,16 @@ namespace NUthreads.Infrastructure.Repositories.Common
         {
             var id = newEntity.Id;
             await _dbSet.AddAsync(newEntity);
-            await _context.SaveChangesAsync();
-            if (GetByIdAsync(id) != null)
+            try
             {
-                return true;
+                await _context.SaveChangesAsync();
             }
-            else
+            catch (Exception ex)
             {
+
                 return false;
             }
+            return true;
         }
 
         public virtual async Task<T> GetByIdAsync(string id)
