@@ -1,23 +1,27 @@
 ﻿namespace NUthreads.Domain.Models
 {
-    public class User : BaseEntity
+    public class User : AuditableEntity
     {
 
-        public string? Username { get; set; }
+        public required string FirstName { get; set; }
 
-        public string? Password { get; set; }
+        public required string LastName { get; set; }
 
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public string? Name { get; set; }
-        public string? Email { get; set; }
+        public required string UserName { get; set; }
 
-        // Hal Da S7 ???
+        public required string Email { get; set; }
 
-        public IList<User>? Followers { get; set; } = new List<User>();
-        public IList<User>? Following { get; set; } = new List<User>();
+        public required string Password { get; set; }
 
-        public IList<Post>? Posts { get; set; } = new List<Post>();
+        // Profile pic somehow
+        public String[]? Followersids { get; set; }
+        public String[]? Followingids { get; set; }
+
+        public String[]? Blockedids { get; set; }
+        public String[]? Postids { get; set; }
+
+        public String[]? Favorite_tags { get; set; }
+
 
 
     }

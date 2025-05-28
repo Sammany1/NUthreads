@@ -1,31 +1,23 @@
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using Microsoft.OpenApi.Models;
-using NUthreads.Infrastructure.Contexts;
-using NUthreads.Infrastructure.Repositories;
+using NUthreads.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Load environment-specific configuration
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
 // Configure MongoDB settings
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDBSettings"));
 
-// Register MongoDB client as a singleton
-builder.Services.AddSingleton<IMongoClient>(sp =>
-{
-    var settings = sp.GetRequiredService<IOptions<MongoDBSettings>>().Value;
-    return new MongoClient(settings.AtlasURI);
-});
+// Get MongoDB settings for infrastructure registration
+var mongoDbSettings = builder.Configuration
+    .GetSection("MongoDBSettings")
+    .Get<MongoDBSettings>();
 
-// m4 3arf de lazmt omha eh
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-// Configure MongoDB mappings
+
+var mongoDbSettingsOptions = Microsoft.Extensions.Options.Options.Create(mongoDbSettings);
+
+// Add infrastructure services (including MongoDB DbContext)
+builder.Services.AddInfrastructure(mongoDbSettingsOptions);
+
 MongoDbMappings.Configure();
 
 // Add controllers and API explorer
@@ -33,16 +25,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 // Configure Swagger
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "NUThreads API",
-        Version = "v1",
-        Description = "API for managing users in NUThreads.",
-    });
-});
-
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -57,6 +40,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Add global exception handling
+app.UseExceptionHandler("/error");
 
 // Enable HTTPS redirection
 app.UseHttpsRedirection();

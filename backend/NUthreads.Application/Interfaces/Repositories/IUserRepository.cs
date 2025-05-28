@@ -1,12 +1,17 @@
-﻿using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Domain.Models;
+using NUthreads.Domain.DTOs;
+using NUthreads.Application.Interfaces.Repositories.Common;
 
-namespace NUthreads.Infrastructure.Repositories
+namespace NUthreads.Application.Interfaces.Repositories
 {
     public interface IUserRepository : IBaseRepository<User>
     {
-        Task<List<User>> GetAllUsers();
+        public Task<bool> EmailExistsAsync(string email);
+        public Task<bool> UsernameExistsAsync(string username);
 
-        Task<bool> DeleteAllUsers();
+        public bool EmailExists(string Email);
+
+        public bool UsernameExists(string username);
+
     }
 }

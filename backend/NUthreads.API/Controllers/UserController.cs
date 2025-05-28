@@ -1,7 +1,7 @@
-﻿using NUthreads.Application.Interfaces.Repositories;
-using NUthreads.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using NUthreads.Infrastructure.Repositories;
+using NUthreads.Application.Interfaces.Repositories;
+using NUthreads.Application.Interfaces.Services;
+using NUthreads.Domain.DTOs;
 
 namespace NUthreads.API.Controllers
 {
@@ -10,85 +10,52 @@ namespace NUthreads.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _repository;
-        public UserController(IUserRepository repository)
+        private readonly ISignUpService _signUpService;
+
+        public UserController(IUserRepository repository, ISignUpService signUpService)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _signUpService = signUpService ?? throw new ArgumentNullException(nameof(signUpService));
         }
 
-        [HttpPost("CreateUser")]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var user = new User
-            {
-                Username = dto.Username,
-                Password = dto.Password,
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Email = dto.Email,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-            // Save to the repository
-            await _repository.Create(user);
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-        }
-
-        [HttpGet("GetUserById")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(string id)
         {
-            var user = await _repository.GetById(id);
-            return Ok(user);
+            var user = await _repository.GetByIdAsync(id);
+            return user is not null ? Ok(user) : NotFound("User not found");
         }
 
-        [HttpGet("GetAllUsers")]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var collection = await _repository.GetAllUsers();
-            return Ok(collection);
-        }
-        [HttpPut("UpdateUser")]
-        public async Task<IActionResult> UpdateUser([FromBody] User user)
+        [HttpPost("SignUp")]
+        public async Task<IActionResult> SignUp([FromBody] NewUserDTO userToCreate)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
-            var existingUser = await _repository.GetById(user.Id);
-            if (existingUser == null)
+            try
             {
-                return NotFound("User not found.");
+                var result = await _signUpService.SignUp(userToCreate);
+                return result;
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-            await _repository.Update(user);
-            return Ok("User updated successfully.");
-        }
-        [HttpDelete("DeleteUser")]
-        public async Task<IActionResult> DeleteUser(string id)
+
+
+        [HttpDelete("DeleteUserByID")]
+        public async Task<IActionResult> DeleteUserByID(string Id)
         {
-            var result = await _repository.Delete(id);
-            if (result)
+            if (await _repository.DeleteAsync(Id))
             {
-                return Ok("User deleted successfully.");
+                return Ok("User With ID : " + Id + " Deleted Successfully");
             }
-            return NotFound("User not found.");
-        }
-        [HttpDelete("DeleteAllUsers")]
-        public async Task<IActionResult> DeleteAllUsers()
-        {
-            var result = await _repository.DeleteAllUsers();
-            if (result)
+            else
             {
-                return Ok("All users deleted successfully.");
+                return BadRequest("FAILED TO DELETE USER WITH ID : " + Id);
             }
-            return NotFound("No users found.");
         }
+
     }
-
 }

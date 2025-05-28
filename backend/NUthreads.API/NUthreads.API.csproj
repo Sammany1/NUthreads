@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../NUthreads.Infrastructure/NUthreads.Infrastructure.csproj" />
+	  <ProjectReference Include="../NUthreads.Infrastructure/NUthreads.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
