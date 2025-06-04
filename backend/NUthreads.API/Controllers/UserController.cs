@@ -11,11 +11,12 @@ namespace NUthreads.API.Controllers
     {
         private readonly IUserRepository _repository;
         private readonly ISignUpService _signUpService;
-
-        public UserController(IUserRepository repository, ISignUpService signUpService)
+        private readonly ILoginService _loginService;
+        public UserController(IUserRepository repository, ISignUpService signUpService, ILoginService loginService)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _signUpService = signUpService ?? throw new ArgumentNullException(nameof(signUpService));
+            _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
         }
 
         [HttpGet("{id}")]
@@ -40,6 +41,15 @@ namespace NUthreads.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginDTO EmailAndPassword)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // Call your service method
+            return await _loginService.Login(EmailAndPassword.Password, EmailAndPassword.Email);
         }
 
 

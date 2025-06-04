@@ -17,7 +17,7 @@ namespace NUthreads.Infrastructure.Repositories
         public UserRepository(NUthreadsDbContext context) : base(context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-             _users= context.Users;
+            _users = context.Users;
         }
 
         public async Task<bool> EmailExistsAsync(string Email)
@@ -30,7 +30,11 @@ namespace NUthreads.Infrastructure.Repositories
             var user = _users.FirstOrDefault(x => x.Email == Email);
             return user != null;
         }
-
+        public async Task<string?> GetPasswordByEmail(string email)
+        {
+            var user = await _users.FirstOrDefaultAsync(x => x.Email == email);
+            return user.Password; // returns  null if not found
+        }
         public async Task<bool> UsernameExistsAsync(string Username)
         {
             var user = await _users.FirstOrDefaultAsync(x => x.UserName == Username);
@@ -38,7 +42,7 @@ namespace NUthreads.Infrastructure.Repositories
         }
         public bool UsernameExists(string Username)
         {
-            var user =  _users.FirstOrDefault(x => x.UserName == Username);
+            var user = _users.FirstOrDefault(x => x.UserName == Username);
             return user != null;
         }
     }
