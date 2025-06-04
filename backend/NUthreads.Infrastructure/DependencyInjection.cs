@@ -3,10 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Application.Interfaces.Services;
+using NUthreads.Application.Interfaces.Utilities;
 using NUthreads.Application.Interfaces.Validators;
 using NUthreads.Infrastructure.Contexts;
 using NUthreads.Infrastructure.Repositories;
 using NUthreads.Infrastructure.Services;
+using NUthreads.Infrastructure.Utilities;
 
 namespace NUthreads.Infrastructure
 {
@@ -24,6 +26,8 @@ namespace NUthreads.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ISignUpService, SignUpService>();
             services.AddScoped<ISignUpValidator, SignUpValidator>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<ILoginService, LoginService>();
 
             return services;
         }

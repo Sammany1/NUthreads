@@ -11,25 +11,25 @@ public static class MongoDbMappings
         BsonClassMap.RegisterClassMap<AuditableEntity>(cm =>
         {
             cm.MapMember(c => c.CreatedAt)
-                .SetSerializer(new DateTimeSerializer(BsonType.DateTime)); 
+                .SetSerializer(new DateTimeSerializer(BsonType.DateTime));
             cm.MapMember(c => c.UpdatedAt)
-              .SetSerializer(new DateTimeSerializer(BsonType.DateTime)); 
-            cm.SetIsRootClass(true); 
+              .SetSerializer(new DateTimeSerializer(BsonType.DateTime));
+            cm.SetIsRootClass(true);
         });
         BsonClassMap.RegisterClassMap<BaseEntity>(cm =>
         {
             cm.MapIdMember(c => c.Id);
-            cm.SetIsRootClass(true); 
+            cm.SetIsRootClass(true);
         });
 
         BsonClassMap.RegisterClassMap<User>(cm =>
         {
-            cm.AutoMap(); 
+            cm.AutoMap();
         });
 
         BsonClassMap.RegisterClassMap<Reply>(cm =>
         {
-            cm.AutoMap(); 
+            cm.AutoMap();
         });
     }
 }

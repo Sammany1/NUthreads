@@ -10,7 +10,7 @@ namespace NUthreads.Application.Interfaces.Repositories
         public Task<bool> UsernameExistsAsync(string username);
 
         public bool EmailExists(string Email);
-
+        public Task<string?> GetPasswordByEmail(string email);
         public bool UsernameExists(string username);
 
     }
