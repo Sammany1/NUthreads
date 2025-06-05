@@ -33,7 +33,7 @@ namespace NUthreads.Infrastructure.Services
                 FirstName = newUser.FirstName,
                 LastName = newUser.LastName,
                 UserName = newUser.UserName,
-                Email = newUser.Email,
+                Email = newUser.Email.ToLower(),
                 Password = Hashed_Password,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,

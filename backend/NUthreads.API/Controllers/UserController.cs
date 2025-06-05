@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Application.Interfaces.Services;
@@ -19,12 +20,6 @@ namespace NUthreads.API.Controllers
             _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(string id)
-        {
-            var user = await _repository.GetByIdAsync(id);
-            return user is not null ? Ok(user) : NotFound("User not found");
-        }
 
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp([FromBody] NewUserDTO userToCreate)
@@ -49,11 +44,17 @@ namespace NUthreads.API.Controllers
                 return BadRequest(ModelState);
 
             // Call your service method
-            return await _loginService.Login(EmailAndPassword.Password, EmailAndPassword.Email);
+            return await _loginService.Login(EmailAndPassword.Password, EmailAndPassword.Email.ToLower());
         }
 
-
-
+        [Authorize]
+        [HttpGet("GetByID")]
+        public async Task<IActionResult> GetUser(string id)
+        {
+            var user = await _repository.GetByIdAsync(id);
+            return user is not null ? Ok(user) : NotFound("User not found");
+        }
+        [Authorize]
         [HttpDelete("DeleteUserByID")]
         public async Task<IActionResult> DeleteUserByID(string Id)
         {
