@@ -45,5 +45,14 @@ namespace NUthreads.Infrastructure.Repositories
             var user = _users.FirstOrDefault(x => x.UserName == Username);
             return user != null;
         }
+
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            return await _users.FirstOrDefaultAsync(x => x.Email == email);
+        }
+        public async Task<User?> GetUserByRefreshToken(string refreshToken)
+        {
+            return await _users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        }
     }
 }

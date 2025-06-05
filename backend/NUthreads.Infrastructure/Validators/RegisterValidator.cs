@@ -3,9 +3,9 @@ using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Application.Interfaces.Validators;
 using NUthreads.Domain.DTOs;
 
-public class SignUpValidator : AbstractValidator<NewUserDTO>, ISignUpValidator
+public class RegisterValidator : AbstractValidator<NewUserDTO>, IRegisterValidator
 {
-    public SignUpValidator(IUserRepository _users)
+    public RegisterValidator(IUserRepository _users)
     {
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required")

@@ -1,25 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NUthreads.Application.Interfaces.Repositories;
-using NUthreads.Application.Interfaces.Services;
 using NUthreads.Application.Interfaces.Utilities;
 using NUthreads.Application.Interfaces.Validators;
+using NUthreads.Application.Interfaces.Services;
 using NUthreads.Domain.DTOs;
 using NUthreads.Domain.Models;
 
 namespace NUthreads.Infrastructure.Services
 {
-    public class SignUpService : ISignUpService
+    public class RegisterService : IRegisterService
     {
         private readonly IUserRepository _users;
-        private readonly ISignUpValidator _validator;
+        private readonly IRegisterValidator _validator;
         private readonly IPasswordHasher _passwordHasher;
-        public SignUpService(IUserRepository userRepository, ISignUpValidator validator, IPasswordHasher passwordHasher)
+        public RegisterService(IUserRepository userRepository, IRegisterValidator validator, IPasswordHasher passwordHasher)
         {
             _users = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _validator = validator ?? throw new ArgumentNullException(nameof(validator));
             _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         }
-        public async Task<IActionResult> SignUp(NewUserDTO newUser)
+        public async Task<IActionResult> Register(NewUserDTO newUser)
         {
             var result = _validator.Validate(newUser);
             if (!result.IsValid)
@@ -42,7 +42,7 @@ namespace NUthreads.Infrastructure.Services
             {
                 return new StatusCodeResult(500); // el howa y3ny fe mo4kla fel database
             }
-            return new OkObjectResult("User created successfully");
+            return new OkObjectResult("User Registered Successfully");
         }
     }
 }

@@ -4,9 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Application.Interfaces.Services;
 using NUthreads.Application.Interfaces.Utilities;
-using NUthreads.Domain.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 namespace NUthreads.Infrastructure.Services;
 
@@ -15,52 +15,41 @@ public class LoginService : ILoginService
     private readonly IUserRepository _users;
     private readonly IConfiguration _configuration;
     private readonly IPasswordHasher _passwordHasher;
-    public LoginService(IUserRepository userRepository, IConfiguration configuration, IPasswordHasher passwordHasher)
+    private readonly ITokenGenerator _tokenGenerator;
+    public LoginService(IUserRepository userRepository, IConfiguration configuration, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator)
     {
         _configuration = configuration;
         _users = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
+        _tokenGenerator = tokenGenerator ?? throw new ArgumentNullException(nameof(tokenGenerator)); ;
     }
     public async Task<IActionResult> Login(string password, string email)
     {
-        string? storedHashedPassword = await _users.GetPasswordByEmail(email);
-        if (storedHashedPassword == null)
-        {
+        var user = await _users.GetUserByEmail(email);
+        if (user == null)
             return new NotFoundObjectResult("No Account Exists With This Email.");
-        }
-
+        string storedHashedPassword = user.Password;
         bool isValid = _passwordHasher.VerifyPassword(password, storedHashedPassword);
         if (!isValid)
         {
             return new ObjectResult("Wrong Password.") { StatusCode = 401 };
         }
-        var token = GenerateJwtToken(email);  
+        var accessToken = _tokenGenerator.GenerateJwtToken(email);
+        var refreshToken = _tokenGenerator.GenerateRefreshToken();
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
 
-        return new OkObjectResult(new { Token = token, Message = "Logged In Successfully" });
+        await _users.UpdateAsync(user);
 
-    }
-    public string GenerateJwtToken(string userEmail)
-    {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
+        return new OkObjectResult(new
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userEmail),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
-        };
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            Message = "Logged In Successfully"
+        });
 
-        var token = new JwtSecurityToken(
-            issuer: jwtSettings["Issuer"],
-            audience: jwtSettings["Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["Token_Duration"])),
-            signingCredentials: creds);
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
     }
+    
+
 
 }

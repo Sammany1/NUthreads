@@ -3,8 +3,8 @@ using NUthreads.Domain.DTOs;
 
 namespace NUthreads.Application.Interfaces.Services
 {
-    public interface ISignUpService
+    public interface IRegisterService
     {
-        Task<IActionResult> SignUp(NewUserDTO newUser);
+        Task<IActionResult> Register(NewUserDTO newUser);
     }
 }

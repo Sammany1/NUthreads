@@ -16,18 +16,25 @@ namespace NUthreads.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IOptions<MongoDBSettings> settings)
         {
-            var connectionString = settings.Value.ConnectionString;
-            var dbName = settings.Value.DatabaseName;
+            var connectionString = settings.Value.ConnectionString ?? throw new ArgumentNullException("Connection String Is Null"); ;
+            var dbName = settings.Value.DatabaseName ?? throw new ArgumentNullException("Database Name Is Null"); ;
+
             services.AddDbContext<NUthreadsDbContext>(options =>
             {
                 options.UseMongoDB(connectionString, dbName);
             });
 
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<ISignUpService, SignUpService>();
-            services.AddScoped<ISignUpValidator, SignUpValidator>();
+            services.AddScoped<IRegisterService, RegisterService>();
+            services.AddScoped<IRegisterValidator, RegisterValidator>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<ILoginService, LoginService>();
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            services.AddScoped<ITokenGenerator, TokenGenerator>();
+            services.AddSingleton<IRevokedTokenRepository, RevokedTokenRepository>();
+
+
+
 
             return services;
         }
