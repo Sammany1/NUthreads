@@ -1,4 +1,4 @@
-﻿using NUthreads.Domain.Models;
+﻿namespace NUthreads.Domain.Models;
 
 public class RevokedToken : BaseEntity
 {

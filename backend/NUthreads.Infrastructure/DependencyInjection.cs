@@ -23,7 +23,7 @@ namespace NUthreads.Infrastructure
             {
                 options.UseMongoDB(connectionString, dbName);
             });
-
+            services.AddScoped<IRevokedTokenRepository, RevokedTokenRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRegisterService, RegisterService>();
             services.AddScoped<IRegisterValidator, RegisterValidator>();
@@ -31,7 +31,6 @@ namespace NUthreads.Infrastructure
             services.AddScoped<ILoginService, LoginService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
-            services.AddSingleton<IRevokedTokenRepository, RevokedTokenRepository>();
 
 
 

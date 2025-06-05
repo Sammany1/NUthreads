@@ -25,12 +25,13 @@ namespace NUthreads.Infrastructure.Utilities
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userEmail),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat,
-                          DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
-                          ClaimValueTypes.Integer64)
-            };
+        new Claim(JwtRegisteredClaimNames.Sub, userEmail),
+        new Claim("email", userEmail),   // Added email claim here
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(JwtRegisteredClaimNames.Iat,
+                  DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+                  ClaimValueTypes.Integer64)
+    };
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
@@ -41,6 +42,7 @@ namespace NUthreads.Infrastructure.Utilities
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
         public string GenerateRefreshToken()
         {

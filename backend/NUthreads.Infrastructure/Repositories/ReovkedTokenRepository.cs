@@ -1,24 +1,31 @@
-﻿using MongoDB.Driver;
-using NUthreads.Infrastructure.Repositories.Common;
+﻿using NUthreads.Infrastructure.Repositories.Common;
+using Microsoft.EntityFrameworkCore;
+using NUthreads.Infrastructure.Contexts;
+using NUthreads.Domain.Models;
+using NUthreads.Application.Interfaces.Repositories;
 
-public class RevokedTokenRepository : BaseRepository<RevokedToken>, IRevokedTokenRepository
+namespace NUthreads.Infrastructure.Repositories
 {
-    private readonly IMongoCollection<RevokedToken> _collection;
-
-    public RevokedTokenRepository(IMongoDatabase database)
+    public class RevokedTokenRepository : BaseRepository<RevokedToken>, IRevokedTokenRepository
     {
-        _collection = database.GetCollection<RevokedToken>("RevokedTokens");
-    }
+        private readonly NUthreadsDbContext _context;
+        private readonly DbSet<RevokedToken> _tokens;
 
-    public async Task AddAsync(RevokedToken token)
-    {
-        await _collection.InsertOneAsync(token);
-    }
+        public RevokedTokenRepository(NUthreadsDbContext context) : base(context)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _tokens = context.RevokedTokens;
+        }
 
-    public async Task<bool> IsTokenRevokedAsync(string token)
-    {
-        var filter = Builders<RevokedToken>.Filter.Eq(t => t.Token, token);
-        var result = await _collection.Find(filter).FirstOrDefaultAsync();
-        return result != null;
+        public async Task AddAsync(RevokedToken token)
+        {
+            await _tokens.AddAsync(token);
+        }
+
+        public async Task<bool> IsTokenRevokedAsync(string token)
+        {
+            var result = await _tokens.FirstOrDefaultAsync(x => x.Token == token);
+            return result != null;
+        }
     }
 }

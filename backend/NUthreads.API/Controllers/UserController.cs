@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using NUthreads.Application.Interfaces.Repositories;
 using NUthreads.Application.Interfaces.Services;
 using NUthreads.Domain.DTOs;
+using NUthreads.Domain.Models;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace NUthreads.API.Controllers
 {
@@ -125,7 +125,13 @@ namespace NUthreads.API.Controllers
 
             return Ok("Logged out successfully");
         }
-
+        [Authorize]
+        [HttpGet("TestAuth")]
+        public IActionResult TestAuthorization()
+        {
+            var email = User.FindFirst("email")?.Value ?? "No email claim";
+            return Ok($"Authorized! Email claim: {email}");
+        }
 
     }
 }

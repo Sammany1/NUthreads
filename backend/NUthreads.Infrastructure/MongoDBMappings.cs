@@ -30,5 +30,10 @@ public static class MongoDbMappings
         {
             cm.AutoMap();
         });
+
+        BsonClassMap.RegisterClassMap<RevokedToken>(cm =>
+        {
+            cm.AutoMap();
+        });
     }
 }

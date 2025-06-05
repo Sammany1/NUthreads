@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using NUthreads.Application.Interfaces.Repositories;
-using NUthreads.Domain.DTOs;
 using NUthreads.Domain.Models;
 using NUthreads.Infrastructure.Contexts;
 using NUthreads.Infrastructure.Repositories.Common;
@@ -33,7 +32,7 @@ namespace NUthreads.Infrastructure.Repositories
         public async Task<string?> GetPasswordByEmail(string email)
         {
             var user = await _users.FirstOrDefaultAsync(x => x.Email == email);
-            return user.Password; // returns  null if not found
+            return user.Password;
         }
         public async Task<bool> UsernameExistsAsync(string Username)
         {
