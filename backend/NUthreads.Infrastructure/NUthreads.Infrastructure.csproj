@@ -1,12 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
@@ -14,10 +13,9 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.3" />
     <PackageReference Include="MongoDB.EntityFrameworkCore" Version="8.2.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="../NUthreads.Application/NUthreads.Application.csproj" />
   </ItemGroup>
-
 </Project>
